@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boyfriend Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .chat-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 400px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            display: flex;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .input-group button {
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        .bot-message {
+            color: blue;
+        }
+        .user-message {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Boyfriend Bot</h1>
+        <div id="chat-box" class="chat-box"></div>
+        <div class="input-group">
+            <input type="text" id="user-input" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const userMessage = userInput.value;
+
+            if (userMessage.trim() === "") return;
+
+            // Display user message
+            const userDiv = document.createElement("div");
+            userDiv.className = "user-message";
+            userDiv.textContent = "You: " + userMessage;
+            chatBox.appendChild(userDiv);
+
+            // Clear input field
+            userInput.value = "";
+
+            // Scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Send message to the bot
+            fetch("/get_response", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: userMessage }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    const botDiv = document.createElement("div");
+                    botDiv.className = "bot-message";
+                    botDiv.textContent = "BoyfriendBot: " + data.response;
+                    chatBox.appendChild(botDiv);
+
+                    // Scroll to the bottom
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</body>
+</html>
